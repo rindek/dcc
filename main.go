@@ -30,16 +30,12 @@ func printUsage() {
 	fmt.Printf("Example: %s v1 v3.2 docker-compose.yml\n", os.Args[0])
 }
 
-func availableFrom() []string {
-	versions := []string{"v1"}
+var availableFrom []string = []string{"v1"}
+var availableTo []string = []string{"v3.2"}
 
-	return versions
-}
-
-func availableTo() []string {
-	versions := []string{"v3.2"}
-
-	return versions
+func printAndExit(err error) {
+	fmt.Println(err)
+	os.Exit(1)
 }
 
 func validateVersion(ver string, available []string, txt string) error {
@@ -50,7 +46,6 @@ func validateVersion(ver string, available []string, txt string) error {
 	}
 
 	errmsg := fmt.Sprintf("Unknown version %s for %s, available ones are: %s", ver, txt, strings.Join(available, ", "))
-	fmt.Println(errmsg)
 
 	return errors.New(errmsg)
 }
@@ -63,19 +58,31 @@ func main() {
 		os.Exit(1)
 	}
 
-	errf := validateVersion(opts.Args.From, availableFrom(), "input")
-	errt := validateVersion(opts.Args.To, availableTo(), "output")
+	err = func() error {
+		if e := validateVersion(opts.Args.From, availableFrom, "input"); e != nil {
+			return e
+		}
 
-	if errf != nil || errt != nil {
-		os.Exit(1)
+		if e := validateVersion(opts.Args.To, availableTo, "output"); e != nil {
+			return e
+		}
+
+		return nil
+	}()
+
+	if err != nil {
+		printAndExit(err)
 	}
 
-	f := loadFile(opts.Args.File)
+	f, err := loadFile(opts.Args.File)
+	if err != nil {
+		printAndExit(err)
+	}
 
 	convert(opts.Args.From, opts.Args.To, f)
 }
 
-func convert(from string, to string, compose []byte) {
+func convert(from string, to string, compose []byte) error {
 	var out interface{}
 
 	if from == "v1" {
@@ -83,31 +90,33 @@ func convert(from string, to string, compose []byte) {
 
 		err := yaml.Unmarshal(compose, &c)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		switch to {
 		case "v3.2":
 			out = v1tov32(&c)
+		default:
+			return fmt.Errorf("Wrong version %s", to)
 		}
 	}
 
 	newver, err := yaml.Marshal(&out)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	fmt.Println(string(newver))
+	return nil
 }
 
-func loadFile(path string) []byte {
+func loadFile(path string) ([]byte, error) {
 	f, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return nil, err
 	}
 
-	return f
+	return f, nil
 }
