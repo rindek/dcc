@@ -4,10 +4,18 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+
+	"gopkg.in/yaml.v2"
 )
 
-func v1tov32(in *composev1) composev32 {
+func v1tov32(bytes *[]byte) ([]byte, error) {
+	var in composev1
 	var out composev32
+
+	err := yaml.Unmarshal(*bytes, &in)
+	if err != nil {
+		return nil, err
+	}
 
 	fmt.Println("# NOTE: In v3.2 the following keys are not supported and will be ignored:")
 	fmt.Println("# \t- extends")
@@ -18,7 +26,7 @@ func v1tov32(in *composev1) composev32 {
 	out.Services = make(map[string]V32Service)
 	out.Volumes = make(map[string]V32Volume)
 
-	for k, v := range *in {
+	for k, v := range in {
 
 		out.Services[k] = V32Service{
 			Build: V32ServiceBuild{
@@ -80,7 +88,12 @@ func v1tov32(in *composev1) composev32 {
 		}
 	}
 
-	return out
+	bytesout, err := yaml.Marshal(&out)
+	if err != nil {
+		return nil, err
+	}
+
+	return bytesout, nil
 }
 
 func extractRegexpVars(reg *regexp.Regexp, str *string) map[string]string {
