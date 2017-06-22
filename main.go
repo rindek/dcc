@@ -7,8 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"gopkg.in/yaml.v2"
-
 	"github.com/jessevdk/go-flags"
 )
 
@@ -30,8 +28,8 @@ func printUsage() {
 	fmt.Printf("Example: %s v1 v3.2 docker-compose.yml\n", os.Args[0])
 }
 
-var availableFrom []string = []string{"v1"}
-var availableTo []string = []string{"v3.2"}
+var availableFrom = []string{"v1"}
+var availableTo = []string{"v3.2"}
 
 func printAndExit(err error) {
 	fmt.Println(err)
@@ -79,35 +77,19 @@ func main() {
 		printAndExit(err)
 	}
 
-	convert(opts.Args.From, opts.Args.To, f)
+	if err = convert(opts.Args.From, opts.Args.To, f); err != nil {
+		printAndExit(err)
+	}
 }
 
+// for now only v1 to v3.2 works
 func convert(from string, to string, compose []byte) error {
-	var out interface{}
-
-	if from == "v1" {
-		var c composev1
-
-		err := yaml.Unmarshal(compose, &c)
-		if err != nil {
-			return err
-		}
-
-		switch to {
-		case "v3.2":
-			out = v1tov32(&c)
-		default:
-			return fmt.Errorf("Wrong version %s", to)
-		}
-	}
-
-	newver, err := yaml.Marshal(&out)
-
+	out, err := v1tov32(&compose)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(string(newver))
+	fmt.Println(string(out))
 	return nil
 }
 
