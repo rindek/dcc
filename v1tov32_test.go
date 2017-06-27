@@ -83,4 +83,60 @@ var _ = Describe("v1tov32", func() {
 			Expect(extractRegexpVars(re, &str)).To(Equal(exp))
 		})
 	})
+
+	Describe("parseVolumesToLongFormat", func() {
+		Context("named volumes", func() {
+			in := []string{"test:/var"}
+			v := map[string]V32Volume{}
+			out := parseVolumesToLongFormat(in, v)
+
+			It("has proper volume defined", func() {
+				e := []V32ServiceVolumes{
+					V32ServiceVolumes{
+						Type:   "volume",
+						Source: "test",
+						Target: "/var",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+
+			It("has a global volume defined", func() {
+				Expect(v).NotTo(BeEmpty())
+			})
+
+			It("has proper global volume defined", func() {
+				e := V32Volume{
+					Driver: "local",
+					External: V32ExternalResource{
+						Name: "test",
+					},
+				}
+
+				Expect(v["test"]).To(Equal(e))
+			})
+		})
+		Context("path volumes", func() {
+			in := []string{"/var/www:/app"}
+			v := map[string]V32Volume{}
+			out := parseVolumesToLongFormat(in, v)
+
+			It("has proper volume defined", func() {
+				e := []V32ServiceVolumes{
+					V32ServiceVolumes{
+						Type:   "bind",
+						Source: "/var/www",
+						Target: "/app",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+
+			It("has no global volume defined", func() {
+				Expect(v).To(BeEmpty())
+			})
+		})
+	})
 })
