@@ -73,7 +73,7 @@ type V1UlimitsNofile struct {
 	Hard int `yaml:"hard,omitempty"`
 }
 
-func (q *CpuQuota) asCpus() string {
+func (q *CpuQuota) AsCpus() string {
 	cpusf := float64(*q) / 100000
 	cpuss := strconv.FormatFloat(cpusf, 'f', -1, 32)
 

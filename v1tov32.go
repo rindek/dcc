@@ -42,7 +42,7 @@ func v1tov32(bytes *[]byte) ([]byte, error) {
 				Resources: V32ServiceDeployResources{
 					Limits: V32ServiceDeployResourcesTable{
 						Memory: v.MemLimit,
-						Cpus:   v.CpuQuota.asCpus(),
+						Cpus:   v.CpuQuota.AsCpus(),
 					},
 				},
 				RestartPolicy: V32ServiceDeployRestartPolicy{

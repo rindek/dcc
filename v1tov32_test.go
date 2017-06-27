@@ -1,21 +1,37 @@
 package main
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestParseRestartPolicy(test *testing.T) {
-	tests := map[string]string{
-		"always":         "",
-		"unless-stopped": "",
-		"no":             "none",
-		"other":          "other",
-	}
+var _ = Describe("v1tov32", func() {
+	Describe("parseRestartPolicy", func() {
 
-	for t, e := range tests {
-		v := parseRestartPolicy(t)
-		if v != e {
-			test.Errorf("Value from %s: Expected %s, got %s", t, e, v)
+		tests := map[string]string{
+			"always":         "",
+			"unless-stopped": "",
+			"no":             "none",
+			"other":          "other",
 		}
-	}
-}
+
+		It("returns proper values", func() {
+			for t, e := range tests {
+				Expect(parseRestartPolicy(t)).To(Equal(e))
+			}
+		})
+	})
+
+	Describe("getProto", func() {
+		tests := map[string]string{
+			"":    "tcp",
+			"udp": "udp",
+		}
+
+		It("returns proper values", func() {
+			for t, e := range tests {
+				Expect(getProto(t)).To(Equal(e))
+			}
+		})
+	})
+})
