@@ -40,41 +40,42 @@ type V33NetworkIPAMConfig struct {
 }
 
 type V33Service struct {
-	Build           V33ServiceBuild       `yaml:"build,omitempty"`
-	CapAdd          []string              `yaml:"cap_add,omitempty"`
-	CapDrop         []string              `yaml:"cap_drop,omitempty"`
-	Command         string                `yaml:"command,omitempty"`
-	CGroupParent    string                `yaml:"cgroup_parent,omitempty"`
-	ContainerName   string                `yaml:"container_name,omitempty"`
-	Deploy          V33ServiceDeploy      `yaml:"deploy,omitempty"`
-	Devices         []string              `yaml:"devices,omitempty"`
-	DependsOn       []string              `yaml:"depends_on,omitempty"`
-	DNS             []string              `yaml:"dns,omitempty"`
-	DNSSearch       []string              `yaml:"dns_search,omitempty"`
-	TmpFS           []string              `yaml:"tmpfs,omitempty"`
-	Entrypoint      string                `yaml:"entrypoint,omitempty"`
-	EnvFile         string                `yaml:"env_file,omitempty"`
-	Environment     []string              `yaml:"environment,omitempty"`
-	Expose          []string              `yaml:"expose,omitempty"`
-	ExternalLinks   []string              `yaml:"external_links,omitempty"`
-	ExtraHosts      []string              `yaml:"extra_hosts,omitempty"`
-	Healthcheck     V33ServiceHealthcheck `yaml:"healthcheck,omitempty"`
-	Image           string                `yaml:"image,omitempty"`
-	Isolation       string                `yaml:"isolation,omitempty"`
-	Labels          []string              `yaml:"labels,omitempty"`
-	Links           []string              `yaml:"links,omitempty"`
-	Logging         V33ServiceLogging     `yaml:"logging,omitempty"`
-	NetworkMode     string                `yaml:"network_mode,omitempty"`
-	Networks        []string              `yaml:"networks,omitempty"`
-	Pid             string                `yaml:"pid,omitempty"`
-	Ports           []V33ServicePorts     `yaml:"ports,omitempty"`
-	Secrets         []V33ServiceSecrets   `yaml:"secrets,omitempty"`
-	SecurityOpt     []string              `yaml:"security_opt,omitempty"`
-	StopGracePeriod string                `yaml:"stop_grace_period,omitempty"`
-	StopSignal      string                `yaml:"stop_signal,omitempty"`
-	SysCtls         []string              `yaml:"sysctls,omitempty"`
-	ULimits         V1Ulimits             `yaml:"ulimits,omitempty"`
-	Volumes         []V33ServiceVolumes   `yaml:"volumes,omitempty"`
+	Build           V33ServiceBuild          `yaml:"build,omitempty"`
+	CapAdd          []string                 `yaml:"cap_add,omitempty"`
+	CapDrop         []string                 `yaml:"cap_drop,omitempty"`
+	Command         string                   `yaml:"command,omitempty"`
+	CGroupParent    string                   `yaml:"cgroup_parent,omitempty"`
+	ContainerName   string                   `yaml:"container_name,omitempty"`
+	CredentialSpec  V33ServiceCredentialSpec `yaml:"credential_spec,omitempty"`
+	Deploy          V33ServiceDeploy         `yaml:"deploy,omitempty"`
+	Devices         []string                 `yaml:"devices,omitempty"`
+	DependsOn       []string                 `yaml:"depends_on,omitempty"`
+	DNS             []string                 `yaml:"dns,omitempty"`
+	DNSSearch       []string                 `yaml:"dns_search,omitempty"`
+	TmpFS           []string                 `yaml:"tmpfs,omitempty"`
+	Entrypoint      string                   `yaml:"entrypoint,omitempty"`
+	EnvFile         string                   `yaml:"env_file,omitempty"`
+	Environment     []string                 `yaml:"environment,omitempty"`
+	Expose          []string                 `yaml:"expose,omitempty"`
+	ExternalLinks   []string                 `yaml:"external_links,omitempty"`
+	ExtraHosts      []string                 `yaml:"extra_hosts,omitempty"`
+	Healthcheck     V33ServiceHealthcheck    `yaml:"healthcheck,omitempty"`
+	Image           string                   `yaml:"image,omitempty"`
+	Isolation       string                   `yaml:"isolation,omitempty"`
+	Labels          []string                 `yaml:"labels,omitempty"`
+	Links           []string                 `yaml:"links,omitempty"`
+	Logging         V33ServiceLogging        `yaml:"logging,omitempty"`
+	NetworkMode     string                   `yaml:"network_mode,omitempty"`
+	Networks        []string                 `yaml:"networks,omitempty"`
+	Pid             string                   `yaml:"pid,omitempty"`
+	Ports           []V33ServicePorts        `yaml:"ports,omitempty"`
+	Secrets         []V33ServiceSecrets      `yaml:"secrets,omitempty"`
+	SecurityOpt     []string                 `yaml:"security_opt,omitempty"`
+	StopGracePeriod string                   `yaml:"stop_grace_period,omitempty"`
+	StopSignal      string                   `yaml:"stop_signal,omitempty"`
+	SysCtls         []string                 `yaml:"sysctls,omitempty"`
+	ULimits         V1Ulimits                `yaml:"ulimits,omitempty"`
+	Volumes         []V33ServiceVolumes      `yaml:"volumes,omitempty"`
 
 	Restart    string `yaml:"restart,omitempty"`
 	User       string `yaml:"user,omitempty"`
@@ -141,6 +142,11 @@ type V33ServiceBuild struct {
 	Args       map[string]string `yaml:"args,omitempty"`
 	CacheFrom  []string          `yaml:"cache_from,omitempty"`
 	Labels     []string          `yaml:"labels,omitempty"`
+}
+
+type V33ServiceCredentialSpec struct {
+	File     string `yaml:"file,omitempty"`
+	Registry string `yaml:"registry,omitempty"`
 }
 
 type V33ServiceDeploy struct {
