@@ -46,7 +46,7 @@ func v1tov32(bytes *[]byte) ([]byte, error) {
 					},
 				},
 				RestartPolicy: V32ServiceDeployRestartPolicy{
-					Condition: v.Restart,
+					Condition: parseRestartPolicy(v.Restart),
 				},
 			},
 			Devices:       v.Devices,
@@ -135,6 +135,18 @@ func Atoi(s string) int {
 	}
 
 	return i
+}
+
+func parseRestartPolicy(in string) string {
+	switch in {
+	case "always", "unless-stopped": // "always" means "any" in deploy, which is default, do not return anything
+		// "unless-stopped" is not handled by "service", defaulting to nil
+		return ""
+	case "no":
+		return "none"
+	}
+
+	return in
 }
 
 func parseVolumesToLongFormat(in []string, volumes map[string]V32Volume) []V32ServiceVolumes {
