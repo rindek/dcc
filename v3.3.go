@@ -140,6 +140,7 @@ type V33ServiceBuild struct {
 	Dockerfile string            `yaml:"dockerfile,omitempty"`
 	Args       map[string]string `yaml:"args,omitempty"`
 	CacheFrom  []string          `yaml:"cache_from,omitempty"`
+	Labels     []string          `yaml:"labels,omitempty"`
 }
 
 type V33ServiceDeploy struct {
