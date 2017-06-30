@@ -139,4 +139,248 @@ var _ = Describe("v1tov32", func() {
 			})
 		})
 	})
+
+	Describe("parsePortsToLongFormat", func() {
+		Context("ip, source and target is range", func() {
+			in := []string{"127.0.0.1:5000-5001:6000-6001"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "127.0.0.1:5000",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    6001,
+						Published: "127.0.0.1:5001",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("source and target is range", func() {
+			in := []string{"5000-5001:6000-6001"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "5000",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    6001,
+						Published: "5001",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("single port with ip", func() {
+			in := []string{"127.0.0.1:5000:6000"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "127.0.0.1:5000",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("single port without ip", func() {
+			in := []string{"5000:6000"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "5000",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("port ranges without publish", func() {
+			in := []string{"5000-5001"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    5000,
+						Published: "",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    5001,
+						Published: "",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("just port", func() {
+			in := []string{"5000"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    5000,
+						Published: "",
+						Protocol:  "tcp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+
+		Context("ip, source and target is range udp", func() {
+			in := []string{"127.0.0.1:5000-5001:6000-6001/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "127.0.0.1:5000",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    6001,
+						Published: "127.0.0.1:5001",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("source and target is range udp", func() {
+			in := []string{"5000-5001:6000-6001/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "5000",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    6001,
+						Published: "5001",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("single port with ip udp", func() {
+			in := []string{"127.0.0.1:5000:6000/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "127.0.0.1:5000",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("single port without ip udp", func() {
+			in := []string{"5000:6000/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    6000,
+						Published: "5000",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("port ranges without publish udp", func() {
+			in := []string{"5000-5001/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    5000,
+						Published: "",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+					V32ServicePorts{
+						Target:    5001,
+						Published: "",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+		Context("just port udp", func() {
+			in := []string{"5000/udp"}
+			out := parsePortsToLongFormat(in)
+
+			It("has proper struct defined", func() {
+				e := []V32ServicePorts{
+					V32ServicePorts{
+						Target:    5000,
+						Published: "",
+						Protocol:  "udp",
+						Mode:      "host",
+					},
+				}
+
+				Expect(out).To(Equal(e))
+			})
+		})
+	})
 })
