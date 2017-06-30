@@ -42,12 +42,8 @@ var _ = Describe("v1tov32", func() {
 				End:   50,
 			}
 
-			f := func() {
-				pr.validate("test")
-			}
-
-			It("panics", func() {
-				Expect(f).To(Panic())
+			It("does not succeed", func() {
+				Expect(pr.validate("test")).NotTo(Succeed())
 			})
 		})
 
@@ -57,10 +53,42 @@ var _ = Describe("v1tov32", func() {
 				End:   150,
 			}
 
-			f := func() { pr.validate("test") }
+			It("validation succeed", func() {
+				Expect(pr.validate("test")).To(Succeed())
+			})
+		})
+	})
 
-			It("does not panic", func() {
-				Expect(f).NotTo(Panic())
+	Describe("PortRange validateRange", func() {
+		Context("invalid range between portranges", func() {
+			this := PortRange{
+				Start: 100,
+				End:   150,
+			}
+
+			that := PortRange{
+				Start: 100,
+				End:   151,
+			}
+
+			It("does not succeed", func() {
+				Expect(this.validateRange(&that, "")).NotTo(Succeed())
+			})
+		})
+
+		Context("valid range between portranges", func() {
+			this := PortRange{
+				Start: 100,
+				End:   150,
+			}
+
+			that := PortRange{
+				Start: 200,
+				End:   250,
+			}
+
+			It("validation does succeed", func() {
+				Expect(this.validateRange(&that, "")).To(Succeed())
 			})
 		})
 	})
