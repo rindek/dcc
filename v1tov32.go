@@ -242,12 +242,7 @@ func parsePortsToLongFormat(in []string) []V32ServicePorts {
 				End:   Atoi(result["te"]),
 			}
 
-			publishRange.validate("Published")
-			targetRange.validate("Target")
-
-			if publishRange.End-publishRange.Start != targetRange.End-targetRange.Start {
-				panic(fmt.Sprintf("Number of published/target ports in range is different, matching port is %s", port))
-			}
+			validateRanges(&publishRange, &targetRange, &port)
 
 			counter := 0
 			for i := publishRange.Start; i <= publishRange.End; i++ {
@@ -274,12 +269,7 @@ func parsePortsToLongFormat(in []string) []V32ServicePorts {
 				End:   Atoi(result["te"]),
 			}
 
-			publishRange.validate("Published")
-			targetRange.validate("Target")
-
-			if publishRange.End-publishRange.Start != targetRange.End-targetRange.Start {
-				panic(fmt.Sprintf("Number of published/target ports in range is different, matching port is %s", port))
-			}
+			validateRanges(&publishRange, &targetRange, &port)
 
 			counter := 0
 			for i := publishRange.Start; i <= publishRange.End; i++ {
