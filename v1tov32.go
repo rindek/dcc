@@ -121,10 +121,12 @@ type PortRange struct {
 	End   int
 }
 
-func (r *PortRange) validate(msg string) {
+func (r *PortRange) validate(msg string) error {
 	if r.End < r.Start {
-		panic(fmt.Sprintf("%s port range is out of bounds, start is %d, end is %d", msg, r.Start, r.End))
+		return fmt.Errorf("%s port range is out of bounds, start is %d, end is %d", msg, r.Start, r.End)
 	}
+
+	return nil
 }
 
 func (r *PortRange) validateRange(other *PortRange, sourcePort string) error {
