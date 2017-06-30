@@ -196,6 +196,27 @@ func parseVolumesToLongFormat(in []string, volumes map[string]V32Volume) []V32Se
 	return out
 }
 
+func validateRanges(pub *PortRange, tar *PortRange, sourcePort *string) {
+	err := func() error {
+		if e := pub.validate("Published"); e != nil {
+			return e
+		}
+
+		if e := tar.validate("Target"); e != nil {
+			return e
+		}
+
+		if e := pub.validateRange(tar, *sourcePort); e != nil {
+			return e
+		}
+		return nil
+	}()
+
+	if err != nil {
+		printAndExit(err)
+	}
+}
+
 func parsePortsToLongFormat(in []string) []V32ServicePorts {
 	var out []V32ServicePorts
 
