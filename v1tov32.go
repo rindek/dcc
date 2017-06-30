@@ -127,6 +127,14 @@ func (r *PortRange) validate(msg string) {
 	}
 }
 
+func (r *PortRange) validateRange(other *PortRange, sourcePort string) error {
+	if r.End-r.Start != other.End-other.Start {
+		return fmt.Errorf("Number of published/target port in range is different, matching port is %s", sourcePort)
+	}
+
+	return nil
+}
+
 func Atoi(s string) int {
 	i, err := strconv.Atoi(s)
 
