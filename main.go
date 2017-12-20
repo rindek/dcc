@@ -9,6 +9,8 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+const VERSION = "0.2"
+
 var opts struct {
 	Args struct {
 		From string `positional-arg-name:"version to convert from"`
@@ -18,6 +20,7 @@ var opts struct {
 }
 
 func printUsage() {
+	fmt.Println(VERSION)
 	fmt.Println("")
 	fmt.Printf("Usage: %s from to file\n", os.Args[0])
 	fmt.Println("\tfrom - version to convert from")
