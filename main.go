@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -28,24 +27,49 @@ func printUsage() {
 	fmt.Printf("Example: %s v1 v3.2 docker-compose.yml\n", os.Args[0])
 }
 
-var availableFrom = []string{"v1"}
-var availableTo = []string{"v3.2"}
+type converter map[string]func(bytes *[]byte) ([]byte, error)
 
 func printAndExit(err error) {
 	fmt.Println(err)
 	os.Exit(1)
 }
 
-func validateVersion(ver string, available []string, txt string) error {
-	for _, i := range available {
-		if ver == i {
+func validateInput(from string, to string) error {
+	convs := getConverters()
+
+	_, ok := convs[from]
+	if ok {
+		_, ok := convs[from][to]
+		if ok {
 			return nil
 		}
 	}
 
-	errmsg := fmt.Sprintf("Unknown version %s for %s, available ones are: %s", ver, txt, strings.Join(available, ", "))
+	return UnknownInputError()
+}
+
+func UnknownInputError() error {
+	convs := getConverters()
+
+	errmsg := "Invalid converter versions, available are:\n"
+
+	for from, tos := range convs {
+		for to, _ := range tos {
+			errmsg = errmsg + fmt.Sprintf("\t* %s -> %s\n", from, to)
+		}
+	}
 
 	return errors.New(errmsg)
+}
+
+func getConverters() map[string]converter {
+	var converters = make(map[string]converter)
+
+	converters["v1"] = converter{
+		"v3.2": v1tov32,
+	}
+
+	return converters
 }
 
 func main() {
@@ -56,18 +80,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = func() error {
-		if e := validateVersion(opts.Args.From, availableFrom, "input"); e != nil {
-			return e
-		}
-
-		if e := validateVersion(opts.Args.To, availableTo, "output"); e != nil {
-			return e
-		}
-
-		return nil
-	}()
-
+	err = validateInput(opts.Args.From, opts.Args.To)
 	if err != nil {
 		printAndExit(err)
 	}
@@ -82,9 +95,10 @@ func main() {
 	}
 }
 
-// for now only v1 to v3.2 works
 func convert(from string, to string, compose []byte) error {
-	out, err := v1tov32(&compose)
+	f := getConverters()[from][to]
+
+	out, err := f(&compose)
 	if err != nil {
 		return err
 	}
