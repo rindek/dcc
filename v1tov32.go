@@ -4,96 +4,84 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-
-	"gopkg.in/yaml.v2"
 )
 
 func v1tov32(bytes *[]byte) ([]byte, error) {
 	var in composev1
 	var out composev32
 
-	err := yaml.Unmarshal(*bytes, &in)
-	if err != nil {
-		return nil, err
-	}
+	return Convertable(&in, &out, bytes, func() {
 
-	fmt.Println("# NOTE: In v3.2 the following keys are not supported and will be ignored:")
-	fmt.Println("# \t- extends")
-	fmt.Println("# \t- volumes_from")
-	fmt.Println("")
+		fmt.Println("# NOTE: In v3.2 the following keys are not supported and will be ignored:")
+		fmt.Println("# \t- extends")
+		fmt.Println("# \t- volumes_from")
+		fmt.Println("")
 
-	out.Version = "3.2"
-	out.Services = make(map[string]V32Service)
-	out.Volumes = make(map[string]V32Volume)
+		out.Version = "3.2"
+		out.Services = make(map[string]V32Service)
+		out.Volumes = make(map[string]V32Volume)
 
-	for k, v := range in {
-
-		out.Services[k] = V32Service{
-			Build: V32ServiceBuild{
-				Context:    v.Build,
-				Dockerfile: v.Dockerfile,
-			},
-			CapAdd:        v.CapAdd,
-			CapDrop:       v.CapDrop,
-			Command:       v.Command,
-			CGroupParent:  v.CGroupParent,
-			ContainerName: v.ContainerName,
-			Deploy: V32ServiceDeploy{
-				Resources: V32ServiceDeployResources{
-					Limits: V32ServiceDeployResourcesTable{
-						Memory: v.MemLimit,
-						Cpus:   v.CpuQuota.AsCpus(),
+		for k, v := range in {
+			out.Services[k] = V32Service{
+				Build: V32ServiceBuild{
+					Context:    v.Build,
+					Dockerfile: v.Dockerfile,
+				},
+				CapAdd:        v.CapAdd,
+				CapDrop:       v.CapDrop,
+				Command:       v.Command,
+				CGroupParent:  v.CGroupParent,
+				ContainerName: v.ContainerName,
+				Deploy: V32ServiceDeploy{
+					Resources: V32ServiceDeployResources{
+						Limits: V32ServiceDeployResourcesTable{
+							Memory: v.MemLimit,
+							Cpus:   v.CpuQuota.AsCpus(),
+						},
+					},
+					RestartPolicy: V32ServiceDeployRestartPolicy{
+						Condition: parseRestartPolicy(v.Restart),
 					},
 				},
-				RestartPolicy: V32ServiceDeployRestartPolicy{
-					Condition: parseRestartPolicy(v.Restart),
+				Devices:       v.Devices,
+				DNS:           v.DNS,
+				DNSSearch:     v.DNSSearch,
+				Entrypoint:    v.Entrypoint,
+				EnvFile:       v.EnvFile,
+				Environment:   v.Environment,
+				Expose:        v.Expose,
+				ExternalLinks: v.ExternalLinks,
+				ExtraHosts:    v.ExtraHosts,
+				Image:         v.Image,
+				Labels:        v.Labels,
+				Links:         v.Links,
+				Logging: V32ServiceLogging{
+					Driver:  v.LogDriver,
+					Options: v.LogOpt,
 				},
-			},
-			Devices:       v.Devices,
-			DNS:           v.DNS,
-			DNSSearch:     v.DNSSearch,
-			Entrypoint:    v.Entrypoint,
-			EnvFile:       v.EnvFile,
-			Environment:   v.Environment,
-			Expose:        v.Expose,
-			ExternalLinks: v.ExternalLinks,
-			ExtraHosts:    v.ExtraHosts,
-			Image:         v.Image,
-			Labels:        v.Labels,
-			Links:         v.Links,
-			Logging: V32ServiceLogging{
-				Driver:  v.LogDriver,
-				Options: v.LogOpt,
-			},
-			NetworkMode: v.Net,
-			Pid:         v.Pid,
-			Ports:       parsePortsToLongFormat(v.Ports),
-			SecurityOpt: v.SecurityOpt,
-			StopSignal:  v.StopSignal,
-			ULimits:     v.ULimits,
-			Volumes:     parseVolumesToLongFormat(v.Volumes, out.Volumes),
+				NetworkMode: v.Net,
+				Pid:         v.Pid,
+				Ports:       parsePortsToLongFormat(v.Ports),
+				SecurityOpt: v.SecurityOpt,
+				StopSignal:  v.StopSignal,
+				ULimits:     v.ULimits,
+				Volumes:     parseVolumesToLongFormat(v.Volumes, out.Volumes),
 
-			Restart:    v.Restart,
-			User:       v.User,
-			WorkingDir: v.WorkingDir,
-			DomainName: v.DomainName,
-			Hostname:   v.Hostname,
-			IPC:        v.IPC,
-			MacAddress: v.MacAddress,
-			Privileged: v.Privileged,
-			ReadOnly:   v.ReadOnly,
-			ShmSize:    v.ShmSize,
-			StdinOpen:  v.StdinOpen,
-			TTY:        v.TTY,
+				Restart:    v.Restart,
+				User:       v.User,
+				WorkingDir: v.WorkingDir,
+				DomainName: v.DomainName,
+				Hostname:   v.Hostname,
+				IPC:        v.IPC,
+				MacAddress: v.MacAddress,
+				Privileged: v.Privileged,
+				ReadOnly:   v.ReadOnly,
+				ShmSize:    v.ShmSize,
+				StdinOpen:  v.StdinOpen,
+				TTY:        v.TTY,
+			}
 		}
-	}
-
-	bytesout, err := yaml.Marshal(&out)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytesout, nil
+	})
 }
 
 func extractRegexpVars(reg *regexp.Regexp, str *string) map[string]string {
