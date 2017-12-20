@@ -6,14 +6,7 @@ type V23 struct {
 	Version  string                `yaml:"version"`
 	Services map[string]V23Service `yaml:"services"`
 	Networks map[string]V23Network `yaml:"networks,omitempty"`
-	Volumes  map[string]V23Volume  `yaml:"volumes,omitempty"`
-}
-
-type V23Volume struct {
-	Driver     string              `yaml:"driver,omitempty"`
-	DriverOpts map[string]string   `yaml:"driver_opts,omitempty"`
-	External   V23ExternalResource `yaml:"external,omitempty"`
-	Labels     []string            `yaml:"labels,omitempty"`
+	Volumes  map[string]V32Volume  `yaml:"volumes,omitempty"`
 }
 
 type V23Network struct {
@@ -60,7 +53,7 @@ type V23Service struct {
 	EnvFile         []string              `yaml:"env_file,omitempty"`
 	Environment     []string              `yaml:"environment,omitempty"`
 	Expose          []string              `yaml:"expose,omitempty"`
-	Extends         V23ServiceExtends     `yaml:"extends,omitempty"`
+	Extends         V1Extends             `yaml:"extends,omitempty"`
 	ExternalLinks   []string              `yaml:"external_links,omitempty"`
 	ExtraHosts      []string              `yaml:"extra_hosts,omitempty"`
 	GroupAdd        []string              `yaml:"group_add,omitempty"`
@@ -70,7 +63,7 @@ type V23Service struct {
 	Isolation       string                `yaml:"isolation,omitempty"`
 	Labels          []string              `yaml:"labels,omitempty"`
 	Links           []string              `yaml:"links,omitempty"`
-	Logging         V23ServiceLogging     `yaml:"logging,omitempty"`
+	Logging         V32ServiceLogging     `yaml:"logging,omitempty"`
 	NetworkMode     string                `yaml:"network_mode,omitempty"`
 	Networks        []string              `yaml:"networks,omitempty"`
 	Pid             string                `yaml:"pid,omitempty"`
@@ -117,11 +110,6 @@ type V23Service struct {
 	TTY       bool   `yaml:"tty,omitempty"`
 }
 
-type V23ServiceLogging struct {
-	Driver  string            `yaml:"driver,omitempty"`
-	Options map[string]string `yaml:"options,omitempty"`
-}
-
 type V23ServiceHealthcheck struct {
 	Test        string `yaml:"test,omitempty"`
 	Interval    string `yaml:"interval,omitempty"`
@@ -140,9 +128,4 @@ type V23ServiceBuild struct {
 	Network    string            `yaml:"network,omitempty"`
 	ShmSize    string            `yaml:"shm_size,omitempty"`
 	Target     string            `yaml:"target,omitempty"`
-}
-
-type V23ServiceExtends struct {
-	File    string `yaml:"file,omitempty"`
-	Service string `yaml:"service,omitempty"`
 }

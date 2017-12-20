@@ -37,7 +37,8 @@ type V1 struct {
 	StopSignal    string            `yaml:"stop_signal,omitempty"`
 	ULimits       V1Ulimits         `yaml:"ulimits,omitempty"`
 	Volumes       []string          `yaml:"volumes,omitempty"`
-	VolumesFrom   string            `yaml:"volumes_from,omitempty"`
+	VolumeDriver  string            `yaml:"volume_driver,omitempty"`
+	VolumesFrom   []string          `yaml:"volumes_from,omitempty"`
 
 	CpuShares    int      `yaml:"cpu_shares,omitempty"`
 	CpuQuota     CpuQuota `yaml:"cpu_quota,omitempty"`

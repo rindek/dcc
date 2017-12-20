@@ -66,6 +66,7 @@ func getConverters() map[string]converter {
 	var converters = make(map[string]converter)
 
 	converters["v1"] = converter{
+		"v2.3": v1tov23,
 		"v3.2": v1tov32,
 	}
 
