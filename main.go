@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -13,9 +12,9 @@ const VERSION = "0.2"
 
 var opts struct {
 	Args struct {
-		From string `positional-arg-name:"version to convert from"`
-		To   string `positional-arg-name:"version to convert to"`
-		File string `positional-arg-name:"path to docker-compose file"`
+		From string `positional-arg-name:"from" description:"version to convert from"`
+		To   string `positional-arg-name:"to" description:"version to convert to"`
+		File string `positional-arg-name:"file" description:"docker-compose yaml file"`
 	} `positional-args:"true" required:"2"`
 }
 
@@ -30,13 +29,6 @@ func printUsage() {
 	fmt.Printf("Example: %s v1 v3.2 docker-compose.yml\n", os.Args[0])
 }
 
-type converter map[string]func(bytes *[]byte) ([]byte, error)
-
-func printAndExit(err error) {
-	fmt.Println(err)
-	os.Exit(1)
-}
-
 func validateInput(from string, to string) error {
 	convs := getConverters()
 
@@ -48,32 +40,7 @@ func validateInput(from string, to string) error {
 		}
 	}
 
-	return UnknownInputError()
-}
-
-func UnknownInputError() error {
-	convs := getConverters()
-
-	errmsg := "Invalid converter versions, available are:\n"
-
-	for from, tos := range convs {
-		for to, _ := range tos {
-			errmsg = errmsg + fmt.Sprintf("\t* %s -> %s\n", from, to)
-		}
-	}
-
-	return errors.New(errmsg)
-}
-
-func getConverters() map[string]converter {
-	var converters = make(map[string]converter)
-
-	converters["v1"] = converter{
-		"v2.3": v1tov23,
-		"v3.2": v1tov32,
-	}
-
-	return converters
+	return unknownInputError()
 }
 
 func main() {

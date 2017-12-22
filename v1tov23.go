@@ -87,13 +87,3 @@ func parseVolumesToShortFormat(in []string, out *composev23) []string {
 	// return same array of volumes
 	return in
 }
-
-func StringArray(str string) []string {
-	out := []string{str}
-
-	if str == "" {
-		return nil
-	}
-
-	return out
-}
