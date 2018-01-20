@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/jessevdk/go-flags"
 )
-
-const VERSION = "0.2"
 
 var opts struct {
 	Args struct {
@@ -29,20 +26,6 @@ func printUsage() {
 	fmt.Printf("Example: %s v1 v3.2 docker-compose.yml\n", os.Args[0])
 }
 
-func validateInput(from string, to string) error {
-	convs := getConverters()
-
-	_, ok := convs[from]
-	if ok {
-		_, ok := convs[from][to]
-		if ok {
-			return nil
-		}
-	}
-
-	return unknownInputError()
-}
-
 func main() {
 	_, err := flags.Parse(&opts)
 
@@ -51,39 +34,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = validateInput(opts.Args.From, opts.Args.To)
+	input := Input{From: opts.Args.From,
+		To:   opts.Args.To,
+		File: opts.Args.File,
+	}
+
+	if err = input.loadFile(); err != nil {
+		printAndExit(err)
+	}
+
+	output, err := input.Convert()
+
 	if err != nil {
 		printAndExit(err)
 	}
 
-	f, err := loadFile(opts.Args.File)
-	if err != nil {
-		printAndExit(err)
-	}
-
-	if err = convert(opts.Args.From, opts.Args.To, f); err != nil {
-		printAndExit(err)
-	}
-}
-
-func convert(from string, to string, compose []byte) error {
-	f := getConverters()[from][to]
-
-	out, err := f(&compose)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(out))
-	return nil
-}
-
-func loadFile(path string) ([]byte, error) {
-	f, err := ioutil.ReadFile(path)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	output.Print()
 }

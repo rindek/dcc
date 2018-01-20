@@ -22,15 +22,7 @@ func printAndExit(err error) {
 }
 
 func unknownInputError() error {
-	convs := getConverters()
-
-	errmsg := "Invalid converter versions, available are:\n"
-
-	for from, tos := range convs {
-		for to, _ := range tos {
-			errmsg = errmsg + fmt.Sprintf("\t* %s -> %s\n", from, to)
-		}
-	}
+	errmsg := "Invalid converter versions"
 
 	return errors.New(errmsg)
 }

@@ -2,9 +2,37 @@ package main
 
 import (
 	"strconv"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
-type composev1 map[string]V1
+type composev1 struct {
+	Input    *Input
+	Document map[string]V1
+}
+
+func (c *composev1) Marshal(out interface{}) Output {
+	bytes, _ := yaml.Marshal(out)
+
+	return Output{Out: bytes}
+}
+
+func (c *composev1) Unmarshal() {
+	yaml.Unmarshal(c.Input.In, &c.Document)
+}
+
+func (c composev1) Convert() (Output, error) {
+
+	switch c.Input.To {
+	case "v2.3":
+		return c.tov23()
+	case "v3.2":
+		return c.tov32()
+	}
+
+	return Output{}, unknownInputError()
+}
+
 type CpuQuota int
 
 type V1 struct {
